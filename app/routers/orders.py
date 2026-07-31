@@ -58,11 +58,10 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
                 "subtotal": subtotal
             })
             
-        # 2. Insert data order utama
         cursor.execute(
             """INSERT INTO orders (user_id, customer_name, phone_number, address, latitude, longitude, total_price, status, payment_method, notes) 
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
-            (current_user['id'], order.customer_name, order.phone_number, order.address, order.latitude, order.longitude, total_price, "Dijemput", order.payment_method, order.notes)
+            (current_user['id'], order.customer_name, order.phone_number, order.address, order.latitude, order.longitude, total_price, "Menunggu Penjemputan", order.payment_method, order.notes)
         )
         new_order_id = cursor.fetchone()['id']
         
@@ -148,7 +147,7 @@ async def get_all_orders_for_admin():
 @router.patch("/admin/{order_id}/status", response_model=OrderResponse, dependencies=[Depends(require_admin)])
 async def update_order_status(order_id: str, status_update: OrderStatusUpdate):
     """[Admin Only] Mengubah status pesanan."""
-    valid_statuses = ['Menunggu Penjemputan', 'Dijemput', 'Diproses', 'Diantar', 'Selesai', 'Dibatalkan']
+    valid_statuses = ['Menunggu Penjemputan', 'Dijemput', 'Diproses', 'Diantar', 'Selesai']
     if status_update.status not in valid_statuses:
         raise HTTPException(status_code=400, detail=f"Status tidak valid. Gunakan salah satu: {valid_statuses}")
         

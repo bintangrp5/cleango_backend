@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
-from app.routers import services, orders, profiles, auth
+from app.routers import services, orders, profiles, auth, uploads
+from fastapi.staticfiles import StaticFiles
 
 settings = get_settings()
 
@@ -22,11 +23,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Setup Static Files for Uploads
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 # Register Routers
 app.include_router(services.router)
 app.include_router(orders.router)
 app.include_router(profiles.router)
 app.include_router(auth.router)
+app.include_router(uploads.router)
 
 @app.get("/", tags=["Health Check"])
 async def root():
