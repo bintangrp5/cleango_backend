@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     
     -- Status dan Keuangan
     total_price NUMERIC(12, 2) NOT NULL DEFAULT 0.0,
-    status VARCHAR(50) NOT NULL DEFAULT 'Dijemput' CHECK (status IN ('Menunggu Penjemputan', 'Dijemput', 'Diproses', 'Diantar', 'Selesai', 'Dibatalkan')),
+    status VARCHAR(50) NOT NULL DEFAULT 'Dijemput' CHECK (status IN ('Menunggu Penjemputan', 'Dijemput', 'Diproses', 'Diantar', 'Selesai')),
     payment_method VARCHAR(50) DEFAULT 'COD (Bayar di Tempat)',
     payment_status VARCHAR(50) DEFAULT 'Belum Dibayar' CHECK (payment_status IN ('Belum Dibayar', 'Sudah Dibayar')),
     

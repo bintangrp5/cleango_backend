@@ -7,6 +7,7 @@ class ServiceBase(BaseModel):
     description: Optional[str] = Field(None, description="Deskripsi layanan")
     price_per_kg: float = Field(..., gt=0, description="Harga per kilogram (IDR)")
     estimated_duration: str = Field(..., description="Estimasi waktu selesai (misal: 24 Jam)")
+    category: str = Field(default="Reguler", description="Kategori layanan (Reguler, Ekspres, Setrika Saja, Premium)")
     image_url: Optional[str] = None
     is_active: bool = True
 
@@ -18,6 +19,7 @@ class ServiceUpdate(BaseModel):
     description: Optional[str] = None
     price_per_kg: Optional[float] = Field(None, gt=0)
     estimated_duration: Optional[str] = None
+    category: Optional[str] = None
     image_url: Optional[str] = None
     is_active: Optional[bool] = None
 

@@ -17,7 +17,7 @@ class UserLogin(BaseModel):
     password: str
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(user: UserRegister):
+def register(user: UserRegister):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -51,7 +51,7 @@ async def register(user: UserRegister):
         conn.close()
 
 @router.post("/login")
-async def login(user: UserLogin):
+def login(user: UserLogin):
     conn = get_db_connection()
     try:
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)

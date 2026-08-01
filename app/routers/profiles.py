@@ -8,7 +8,7 @@ import psycopg2.extras
 router = APIRouter(prefix="/api/v1/profiles", tags=["Profiles (Data Pengguna)"])
 
 @router.get("/me", response_model=ProfileResponse)
-async def get_my_profile(current_user: dict = Depends(get_current_user)):
+def get_my_profile(current_user: dict = Depends(get_current_user)):
     """Mengambil data profil user yang sedang login saat ini berdasarkan Token."""
     conn = get_db_connection()
     try:
@@ -24,7 +24,7 @@ async def get_my_profile(current_user: dict = Depends(get_current_user)):
         conn.close()
 
 @router.get("/{user_id}", response_model=ProfileResponse)
-async def get_profile_by_id(user_id: str):
+def get_profile_by_id(user_id: str):
     """Mengambil profil user berdasarkan UUID."""
     conn = get_db_connection()
     try:
@@ -40,7 +40,7 @@ async def get_profile_by_id(user_id: str):
         conn.close()
 
 @router.put("/{user_id}", response_model=ProfileResponse)
-async def update_profile(user_id: str, profile_update: ProfileUpdate, current_user: dict = Depends(get_current_user)):
+def update_profile(user_id: str, profile_update: ProfileUpdate, current_user: dict = Depends(get_current_user)):
     """Mengubah data diri (nama, no HP, alamat)."""
     if str(current_user['id']) != user_id and current_user['role'] != 'admin':
         raise HTTPException(status_code=403, detail="Tidak diizinkan mengubah profil orang lain")
@@ -73,7 +73,7 @@ async def update_profile(user_id: str, profile_update: ProfileUpdate, current_us
         conn.close()
 
 @router.get("", response_model=List[ProfileResponse], dependencies=[Depends(require_admin)])
-async def get_all_profiles():
+def get_all_profiles():
     """[Admin Only] Mengambil daftar semua pelanggan dan admin CleanGo."""
     conn = get_db_connection()
     try:

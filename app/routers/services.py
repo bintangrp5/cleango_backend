@@ -8,7 +8,7 @@ import psycopg2.extras
 router = APIRouter(prefix="/api/v1/services", tags=["Services (Layanan Laundry)"])
 
 @router.get("", response_model=List[ServiceResponse])
-async def get_all_services(active_only: bool = True):
+def get_all_services(active_only: bool = True):
     """Mengambil daftar semua layanan laundry (misal: Cuci Reguler, Express, Dry Clean)."""
     conn = get_db_connection()
     try:
@@ -27,7 +27,7 @@ async def get_all_services(active_only: bool = True):
         conn.close()
 
 @router.get("/{service_id}", response_model=ServiceResponse)
-async def get_service_by_id(service_id: str):
+def get_service_by_id(service_id: str):
     """Mengambil detail satu layanan laundry berdasarkan ID."""
     conn = get_db_connection()
     try:
@@ -43,14 +43,14 @@ async def get_service_by_id(service_id: str):
         conn.close()
 
 @router.post("", response_model=ServiceResponse, dependencies=[Depends(require_admin)])
-async def create_service(service: ServiceCreate):
+def create_service(service: ServiceCreate):
     """[Admin Only] Menambahkan layanan laundry baru."""
     conn = get_db_connection()
     try:
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute(
-            "INSERT INTO services (name, description, price_per_kg, estimated_duration, image_url, is_active) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *",
-            (service.name, service.description, service.price_per_kg, service.estimated_duration, service.image_url, service.is_active)
+            "INSERT INTO services (name, description, price_per_kg, estimated_duration, category, image_url, is_active) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *",
+            (service.name, service.description, service.price_per_kg, service.estimated_duration, service.category, service.image_url, service.is_active)
         )
         new_service = cursor.fetchone()
         conn.commit()
@@ -61,7 +61,7 @@ async def create_service(service: ServiceCreate):
         conn.close()
 
 @router.put("/{service_id}", response_model=ServiceResponse, dependencies=[Depends(require_admin)])
-async def update_service(service_id: str, service: ServiceUpdate):
+def update_service(service_id: str, service: ServiceUpdate):
     """[Admin Only] Mengubah data layanan laundry."""
     conn = get_db_connection()
     try:
@@ -87,7 +87,7 @@ async def update_service(service_id: str, service: ServiceUpdate):
         conn.close()
 
 @router.delete("/{service_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_admin)])
-async def delete_service(service_id: str):
+def delete_service(service_id: str):
     """[Admin Only] Menghapus atau menonaktifkan layanan."""
     conn = get_db_connection()
     try:

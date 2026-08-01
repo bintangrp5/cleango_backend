@@ -30,7 +30,7 @@ def fetch_order_with_items(cursor, order_id):
     return order
 
 @router.post("", response_model=OrderResponse)
-async def create_order(order: OrderCreate, current_user: dict = Depends(get_current_user)):
+def create_order(order: OrderCreate, current_user: dict = Depends(get_current_user)):
     """Membuat pesanan laundry baru dari aplikasi mobile Flutter."""
     conn = get_db_connection()
     try:
@@ -87,7 +87,7 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
         conn.close()
 
 @router.get("/user/{user_id}", response_model=List[OrderResponse])
-async def get_user_orders(user_id: str, current_user: dict = Depends(get_current_user)):
+def get_user_orders(user_id: str, current_user: dict = Depends(get_current_user)):
     """Mengambil riwayat pesanan untuk satu user."""
     if str(current_user['id']) != user_id and current_user['role'] != 'admin':
         raise HTTPException(status_code=403, detail="Tidak diizinkan melihat pesanan orang lain")
@@ -108,7 +108,7 @@ async def get_user_orders(user_id: str, current_user: dict = Depends(get_current
         conn.close()
 
 @router.get("/{order_id}", response_model=OrderResponse)
-async def get_order_detail(order_id: str, current_user: dict = Depends(get_current_user)):
+def get_order_detail(order_id: str, current_user: dict = Depends(get_current_user)):
     """Mengambil detail satu pesanan."""
     conn = get_db_connection()
     try:
@@ -127,7 +127,7 @@ async def get_order_detail(order_id: str, current_user: dict = Depends(get_curre
         conn.close()
 
 @router.get("/admin/all", response_model=List[OrderResponse], dependencies=[Depends(require_admin)])
-async def get_all_orders_for_admin():
+def get_all_orders_for_admin():
     """[Admin Only] Mengambil SEMUA pesanan dari seluruh pelanggan."""
     conn = get_db_connection()
     try:
@@ -145,7 +145,7 @@ async def get_all_orders_for_admin():
         conn.close()
 
 @router.patch("/admin/{order_id}/status", response_model=OrderResponse, dependencies=[Depends(require_admin)])
-async def update_order_status(order_id: str, status_update: OrderStatusUpdate):
+def update_order_status(order_id: str, status_update: OrderStatusUpdate):
     """[Admin Only] Mengubah status pesanan."""
     valid_statuses = ['Menunggu Penjemputan', 'Dijemput', 'Diproses', 'Diantar', 'Selesai']
     if status_update.status not in valid_statuses:

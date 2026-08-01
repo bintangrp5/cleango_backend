@@ -34,7 +34,7 @@ class OrderCreate(BaseModel):
     items: List[OrderItemCreate] = Field(..., min_length=1, description="Daftar layanan yang dipesan")
 
 class OrderStatusUpdate(BaseModel):
-    status: str = Field(..., description="Status baru pesanan: Menunggu Penjemputan, Dijemput, Diproses, Diantar, Selesai, Dibatalkan")
+    status: str = Field(..., description="Status baru pesanan: Menunggu Penjemputan, Dijemput, Diproses, Diantar, Selesai")
 
 class OrderResponse(BaseModel):
     id: str
