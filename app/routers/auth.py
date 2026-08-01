@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from app.database import get_db_connection
 from app.security import get_password_hash, verify_password, create_access_token
+from app.deps import get_current_user
 import psycopg2.extras
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
@@ -15,6 +16,10 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register(user: UserRegister):
@@ -78,6 +83,34 @@ def login(user: UserLogin):
                 "role": db_user['role']
             }
         }
+    finally:
+        cursor.close()
+        conn.close()
+
+@router.put("/change-password")
+def change_password(data: ChangePassword, current_user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (current_user['id'],))
+        db_user = cursor.fetchone()
+        
+        if not db_user or not verify_password(data.old_password, db_user['password_hash']):
+            raise HTTPException(
+                status_code=400,
+                detail="Kata sandi lama salah"
+            )
+            
+        hashed_new_password = get_password_hash(data.new_password)
+        
+        cursor.execute(
+            "UPDATE users SET password_hash = %s WHERE id = %s",
+            (hashed_new_password, current_user['id'])
+        )
+        conn.commit()
+        
+        return {"message": "Kata sandi berhasil diubah"}
     finally:
         cursor.close()
         conn.close()
